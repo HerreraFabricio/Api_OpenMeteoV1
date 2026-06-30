@@ -15,11 +15,19 @@ ciudades = {
     "Choluteca": (13.3000, -87.1833)
 }
 
-ciudad = st.selectbox("Seleccione una ciudad:", list(ciudades.keys()))
+# Menú lateral
+st.sidebar.title("Menú")
+st.sidebar.write("Seleccione una ciudad para consultar el clima.")
+
+ciudad = st.sidebar.selectbox(
+    "Ciudad",
+    list(ciudades.keys())
+)
 
 latitud, longitud = ciudades[ciudad]
 
-if st.button("Consultar clima"):
+if st.sidebar.button("Consultar clima"):
+
     datos = obtener_clima_api(latitud, longitud)
 
     if datos:
@@ -37,15 +45,16 @@ if st.button("Consultar clima"):
 
         df = pd.DataFrame({
             "Hora": datos["hourly"]["time"][:24],
-            "Temperatura °C": datos["hourly"]["temperature_2m"][:24],
-            "Humedad %": datos["hourly"]["relative_humidity_2m"][:24],
-            "Viento km/h": datos["hourly"]["wind_speed_10m"][:24]
+            "Temperatura (°C)": datos["hourly"]["temperature_2m"][:24],
+            "Humedad (%)": datos["hourly"]["relative_humidity_2m"][:24],
+            "Viento (km/h)": datos["hourly"]["wind_speed_10m"][:24]
         })
 
         st.dataframe(df, use_container_width=True)
 
         st.subheader("Gráfico de temperatura")
-        st.line_chart(df.set_index("Hora")["Temperatura °C"])
+
+        st.line_chart(df.set_index("Hora")["Temperatura (°C)"])
 
     else:
         st.error("No se pudo obtener información del clima.")
